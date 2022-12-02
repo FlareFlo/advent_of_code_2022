@@ -18,6 +18,8 @@ fn main() {
 	}
 
 	elves.sort();
+	elves.reverse();
 
-	println!("{}", elves.iter().last().unwrap());
+	println!("Carrying most: {}", elves[0]);
+	println!("Top 3: {}", elves[..3].iter().sum::<u32>());
 }
