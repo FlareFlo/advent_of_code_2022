@@ -52,7 +52,7 @@ impl Shape {
 
 
 fn main() {
-	let input = fs::read_to_string("input.txt").expect("Input should exist");
+	let input = fs::read_to_string("../input.txt").expect("Input should exist");
 	let rounds: Vec<(char, char)> = input
 		.split('\n')
 		.map(|row|
