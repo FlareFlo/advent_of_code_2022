@@ -16,15 +16,23 @@ fn main() {
 														  .collect();
 
 	let mut dupes = 0;
+	let mut overlap = 0;
 	for (x, y) in &pairs {
 		if is_inside(x.clone(), y.clone()) || is_inside(y.clone(), x.clone()) {
 			dupes += 1;
 		}
+		if overlaps(x.clone(), y.clone()) || overlaps(y.clone(), x.clone()) {
+			overlap += 1;
+		}
 	}
 	println!("{}", dupes);
-
+	println!("{}", overlap);
 }
 
 fn is_inside(outer: Range<usize>, inner: Range<usize>) -> bool {
 	outer.start <= inner.start && outer.end >= inner.end
+}
+
+fn overlaps(outer: Range<usize>, inner: Range<usize>) -> bool {
+	outer.start.max(inner.start) <= outer.end.min(inner.end)
 }
