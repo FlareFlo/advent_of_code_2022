@@ -19,18 +19,21 @@ fn main() {
 		}
 	}
 
-	containers.iter_mut().for_each(|x|x.reverse());
+	containers.iter_mut().for_each(|x| x.reverse());
 
 	for line in instructions.lines() {
 		let mut x = line.split(' ')
-						   .map(|x| usize::from_str(x).ok())
-						   .filter_map(|x| x);
-		let (count, source, destination) = (x.next().unwrap(), x.next().unwrap(), x.next().unwrap());
+						.map(|x| usize::from_str(x).ok())
+						.filter_map(|x| x);
+		let (count, source_idx, destination_idx) = (x.next().unwrap(), x.next().unwrap() - 1, x.next().unwrap() - 1);
+
 
 		for i in 0..count {
-			let container = containers[source - 1].pop().unwrap();
-			containers[destination - 1].push(container);
+			let val = containers[source_idx].pop().unwrap();
+			let dest_len = containers[destination_idx].len();
+			containers[destination_idx].insert(dest_len - i, val);
 		}
+
 	}
 
 
