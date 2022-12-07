@@ -99,7 +99,7 @@ fn main() {
 
 	// Task 1
 	// let mut totals = vec![];
-	// filter_size(&mut totals, &slash, 100_000);
+	// filter_flatten(&mut totals, &slash, 100_000);
 
 	// println!("{}", totals.iter().map(|x|x.get_size()).sum::<usize>());
 
@@ -109,19 +109,28 @@ fn main() {
 	let required_to_free = need_free - (total_disk - used);
 
 	let mut totals = vec![];
-	filter_size(&mut totals, &slash, usize::MAX);
+	flatten(&mut totals, &slash);
 	totals.sort_by(|x, y|y.get_size().cmp(&x.get_size()));
 
 	println!("{}", totals.iter().filter(|x|x.get_size() >= required_to_free).last().expect("There should be at least one folder").get_size());
 }
 
-fn filter_size(totals: &mut Vec<Dir>, dir: &Dir, limit: usize) {
+fn flatten(totals: &mut Vec<Dir>, dir: &Dir) {
+	for entry in &dir.entries {
+		if let Some(dir) = entry.dir() {
+				totals.push(dir.clone());
+			flatten(totals, dir);
+		}
+	}
+}
+
+fn filter_flatten(totals: &mut Vec<Dir>, dir: &Dir, limit: usize) {
 	for entry in &dir.entries {
 		if let Some(dir) = entry.dir() {
 			if dir.get_size() <= limit  {
 				totals.push(dir.clone());
 			}
-			filter_size(totals, dir, limit);
+			filter_flatten(totals, dir, limit);
 		}
 	}
 }
@@ -129,7 +138,7 @@ fn filter_size(totals: &mut Vec<Dir>, dir: &Dir, limit: usize) {
 fn eval_line(lines: &[&str], at: &mut usize) -> Vec<Entry> {
 	let mut entries = vec![];
 	loop {
-		if lines.len() - 1 == *at {
+		if lines.len() == *at {
 			return entries;
 		}
 
