@@ -3,6 +3,7 @@
 use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::fs::DirEntry;
+use std::process::exit;
 use std::str::FromStr;
 
 #[derive(Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
@@ -48,46 +49,66 @@ impl Entry {
 			}
 		}
 	}
+	pub fn is_dir(&self) -> bool {
+		match self {
+			Entry::File(_) => {
+				false
+			}
+			Entry::Directory(_) => {
+				true
+			}
+		}
+	}
+	pub fn is_file(&self) -> bool {
+		!self.is_dir()
+	}
+	pub fn file(&mut self) -> Option<&mut File> {
+		match self {
+			Entry::File(file) => {Some(file)}
+			Entry::Directory(_) => {None}
+		}
+	}
+	pub fn dir(&mut self) -> Option<&mut Dir> {
+		match self {
+			Entry::File(_) => {None}
+			Entry::Directory(dir) => {Some(dir)}
+		}
+	}
 }
 
 fn main() {
 	let file = fs::read_to_string("input.txt").expect("Input should exist");
 
-	let mut at = 0;
+	let mut at = 1;
 	let entries = eval_line(&file.lines().collect::<Vec<_>>(), &mut at);
-
+	dbg!(entries);
 
 }
 
 fn eval_line(lines: &[&str], at: &mut  usize) -> Vec<Entry> {
 	let mut entries = vec![];
 	loop {
-		*at += 1;
-		let line = &lines[*at - 1];
+		let line = &lines[*at];
+
 		match () {
 			_ if line.starts_with("$ cd ..") => {
+				*at += 1;
 				return entries;
 			}
 			// Ignore as this does nothing right now
 			_ if line.starts_with("$ ls") => {
-				continue;
 			}
 			_ if line.starts_with("$ cd") => {
+				*at += 1;
 				let dirname = line.split(" ").nth(2).expect("Should have a last element");
-				// entries.append(&mut eval_line(lines, at))
-				println!("{}", dirname);
-				if dirname == "/" {
-					continue;
-				}
-				let filtered = entries.iter_mut().filter(|x|x.get_name() == dirname).next().expect("Should find one element");
-				match filtered {
-					Entry::Directory(dir) => {
-						dir.entries = eval_line(&lines, at);
-					}
-					_ => {
-						panic!("Not a dir entry?!")
-					}
-				}
+				println!("{}", "-------------------------");
+				dbg!(&entries, dirname);
+				let recursed_into = entries.iter_mut()
+					.filter(|x|x.get_name() == dirname)
+					.next().expect("Should always find exactly one directory")
+					.dir().expect("Has to be a directory");
+				let mut recursed_folder_entries = eval_line(lines, at);
+				recursed_into.entries.append(&mut recursed_folder_entries);
 			}
 			_ if line.starts_with("dir") => {
 				entries.push(Entry::Directory(Dir {
@@ -105,7 +126,7 @@ fn eval_line(lines: &[&str], at: &mut  usize) -> Vec<Entry> {
 				panic!("Unclear expression for line {}", line);
 			}
 		}
-		dbg!(*at, &entries);
+		*at += 1;
 	}
 }
 
