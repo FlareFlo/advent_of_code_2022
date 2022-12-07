@@ -1,0 +1,9 @@
+$ cd /
+$ ls
+dir cheese
+$ cd cheese
+$ ls
+dir amogus
+$ cd amogus
+$ cd ..
+$ cd ..
