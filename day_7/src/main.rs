@@ -97,10 +97,22 @@ fn main() {
 		entries: eval_line(&file.lines().collect::<Vec<_>>(), &mut at),
 	};
 
-	let mut totals = vec![];
-	filter_size(&mut totals, &slash, 100_000);
+	// Task 1
+	// let mut totals = vec![];
+	// filter_size(&mut totals, &slash, 100_000);
 
-	println!("{}", totals.iter().map(|x|x.get_size()).sum::<usize>());
+	// println!("{}", totals.iter().map(|x|x.get_size()).sum::<usize>());
+
+	let total_disk = 70_000_000;
+	let need_free = 30_000_000;
+	let used = slash.get_size(); // 43_704_276 should be 43_837_783
+	let required_to_free = need_free - (total_disk - used);
+
+	let mut totals = vec![];
+	filter_size(&mut totals, &slash, usize::MAX);
+	totals.sort_by(|x, y|y.get_size().cmp(&x.get_size()));
+
+	println!("{}", totals.iter().filter(|x|x.get_size() >= required_to_free).last().expect("There should be at least one folder").get_size());
 }
 
 fn filter_size(totals: &mut Vec<Dir>, dir: &Dir, limit: usize) {
