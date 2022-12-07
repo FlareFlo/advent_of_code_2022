@@ -7,11 +7,13 @@ use std::str::FromStr;
 
 #[derive(Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
 pub struct File {
+	pub name: String,
 	pub size: usize,
 }
 
 #[derive(Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
 pub struct Dir {
+	pub name: String,
 	pub entries: Vec<Entry>,
 }
 
@@ -36,6 +38,16 @@ impl Entry {
 			}
 		}
 	}
+	pub fn get_name(&self) -> &str {
+		match self {
+			Entry::File(file) => {
+				&file.name
+			}
+			Entry::Directory(dir) => {
+				&dir.name
+			}
+		}
+	}
 }
 
 fn main() {
@@ -50,23 +62,42 @@ fn main() {
 fn eval_line(lines: &[&str], at: &mut  usize) -> Vec<Entry> {
 	let mut entries = vec![];
 	loop {
-		let line = &lines[*at];
+		*at += 1;
+		let line = &lines[*at - 1];
 		match () {
-			_ if line== &"$ cd .." => {
+			_ if line.starts_with("$ cd ..") => {
 				return entries;
 			}
 			// Ignore as this does nothing right now
-			_ if line == &"$ ls" => {}
+			_ if line.starts_with("$ ls") => {
+				continue;
+			}
 			_ if line.starts_with("$ cd") => {
-				entries.append(&mut eval_line(lines, at))
+				let dirname = line.split(" ").nth(2).expect("Should have a last element");
+				// entries.append(&mut eval_line(lines, at))
+				println!("{}", dirname);
+				if dirname == "/" {
+					continue;
+				}
+				let filtered = entries.iter_mut().filter(|x|x.get_name() == dirname).next().expect("Should find one element");
+				match filtered {
+					Entry::Directory(dir) => {
+						dir.entries = eval_line(&lines, at);
+					}
+					_ => {
+						panic!("Not a dir entry?!")
+					}
+				}
 			}
 			_ if line.starts_with("dir") => {
 				entries.push(Entry::Directory(Dir {
+					name: line.split(" ").nth(1).expect("Should have spacebar").to_owned(),
 					entries: vec![],
 				}));
 			}
 			_ if let Ok(size) = usize::from_str(line.split(" ").next().expect("Should have space within it")) => {
 				entries.push(Entry::File(File {
+					name: line.split(" ").nth(1).expect("Should exist").to_owned(),
 					size,
 				}))
 			}
@@ -74,7 +105,7 @@ fn eval_line(lines: &[&str], at: &mut  usize) -> Vec<Entry> {
 				panic!("Unclear expression for line {}", line);
 			}
 		}
-		*at += 1;
+		dbg!(*at, &entries);
 	}
 }
 
