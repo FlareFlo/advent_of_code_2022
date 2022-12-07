@@ -103,12 +103,12 @@ fn eval_line(lines: &[&str], at: &mut  usize) -> Vec<Entry> {
 				let dirname = line.split(" ").nth(2).expect("Should have a last element");
 				println!("{}", "-------------------------");
 				dbg!(&entries, dirname);
-				let recursed_into = entries.iter_mut()
-					.filter(|x|x.get_name() == dirname)
-					.next().expect("Should always find exactly one directory")
-					.dir().expect("Has to be a directory");
-				let mut recursed_folder_entries = eval_line(lines, at);
-				recursed_into.entries.append(&mut recursed_folder_entries);
+				let target_folder = entries.iter_mut()
+										   .filter(|x|x.get_name() == dirname)
+										   .next().expect("Should always find exactly one directory")
+										   .dir().expect("Has to be a directory");
+				let mut target_folder_contents = eval_line(lines, at);
+				target_folder.entries.append(&mut target_folder_contents);
 			}
 			_ if line.starts_with("dir") => {
 				entries.push(Entry::Directory(Dir {
