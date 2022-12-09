@@ -7,7 +7,7 @@ use std::ops::{Deref, Range};
 use std::str::FromStr;
 
 fn main() {
-	let input = fs::read_to_string("input.txt").expect("Input should exist");
+	let input = fs::read_to_string("../input.txt").expect("Input should exist");
 
 	let width = input.lines().next().unwrap().chars().count();
 	let height = input.lines().count();
