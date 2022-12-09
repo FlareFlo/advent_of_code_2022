@@ -7,7 +7,7 @@ use std::ops::{Deref, Range};
 use std::str::FromStr;
 
 fn main() {
-	let input = fs::read_to_string("../sample_input.txt").expect("Input should exist");
+	let input = fs::read_to_string("../input.txt").expect("Input should exist");
 
 	let width = input.lines().next().unwrap().chars().count();
 	let height = input.lines().count();
@@ -25,49 +25,79 @@ fn main() {
 	};
 
 	let score_tree = |(x, y): (usize, usize)| {
+		let center = get_tree_height((x, y));
+
 		// To the right
 		let mut right = 0;
 		let mut max = 0;
-		for x_cord in (x + 1)..width {
+		let right_rng = ((x + 1)..width).collect::<Vec<usize>>();
+		for x_cord in right_rng {
 			let height = get_tree_height((x_cord, y));
-			if height  <= max {
-				break;
-			} else {
+			if height > max {
 				right += 1;
 				max = height;
+			} else {
+				break;
 			}
 		}
 
 		// To the left
 		let mut left = 0;
 		let mut max = 0;
-		let rng = ((0)..(width - 2)).rev().collect::<Vec<usize>>();
-		for x_cord in rng  {
+		let left_rng = ((0)..(width - x - 1)).rev().collect::<Vec<usize>>();
+		for x_cord in left_rng {
 			let height = get_tree_height((x_cord, y));
-			println!("{}", height);
-			if  height <= max {
-				break;
-			} else {
+			if height > max {
 				left += 1;
 				max = height;
+			} else {
+				break;
 			}
 		}
 
+		//  upwards
+		let mut upwards = 0;
+		let mut max = 0;
+		let up_rng = (0..(y)).rev().collect::<Vec<usize>>();
+		eprintln!("up = {:?}", &up_rng);
+		for y_cord in up_rng {
+			let height = get_tree_height((x, y_cord));
+			if height > max {
+				upwards += 1;
+				max = height;
+			} else {
+				break;
+			}
+		}
 
-		dbg!(left, right);
-		right * left
+		//  downwards
+		let mut downwards = 0;
+		let mut max = 0;
+		let down_rng = ((y + 1)..height).collect::<Vec<usize>>();
+		for y_cord in down_rng {
+			let height = get_tree_height((x, y_cord));
+			if height > max {
+				downwards += 1;
+				max = height;
+			} else {
+				break;
+			}
+		}
+
+		println!(
+			"   {}	\n{}--{}--{}\n   {}"
+			, upwards, left, (right * left * upwards * downwards), right, downwards);
+		right * left * upwards * downwards
 	};
 
-	println!("Highest total: {}", score_tree( (3, 3)));
-	/*
-	for (y, row) in map.iter().enumerate() {
-		for (x, cell) in row.iter().enumerate() {
-			let score = score_tree(*cell, (x,y));
-			if score > highest_score {
-				highest_score = score;
-			}
-		}
-	}
-	 */
+	score_tree((2, 3));
+	// for (y, row) in map.iter().enumerate() {
+	// 	for (x, _) in row.iter().enumerate() {
+	// 		let score = score_tree((x, y));
+	// 		if score > highest_score {
+	// 			highest_score = score;
+	// 		}
+	// 	}
+	// }
 	//  println!("{}", highest_score);
 }
