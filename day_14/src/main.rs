@@ -143,7 +143,35 @@ fn main() {
 
 	let mut grid = vec![vec!["."; height]; width];
 
-	let dbg_grid = ||grid.iter().map(|x|x.clone().join(" ")).collect::<Vec<_>>().join("\n");
 
-	eprintln!("{}", dbg_grid());
+	let to_draw: Vec<(Point, Point)> = paths.iter().map(|x| x.items.clone()).flatten().collect();
+
+	for (start, end) in to_draw {
+		// Run on the Y axis
+		if start.0 == end.0 {
+			let rng = if start.1 > end.1 {
+				end.1..(end.1 -  start.1)
+			} else {
+				(start.1..end.1).collect::<Vec<_>>()
+			};
+			for y in rng {
+				grid[y][start.0 - 1] = "#";
+			}
+		} else {
+			let rng = if start.0 > end.0 {
+				(start.0..end.0).rev().collect::<Vec<_>>()
+			} else {
+				(start.0..end.0).collect::<Vec<_>>()
+			};
+
+			// Run on the X axis
+			for x in rng {
+				grid[start.1][x - 1] = "#";
+			}
+		}
+	}
+
+	let mut dbg_grid = || grid.iter().map(|x| x.clone().join(" ")).collect::<Vec<_>>().join("\n");
+
+	println!("{}", dbg_grid());
 }
