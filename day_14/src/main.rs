@@ -141,7 +141,7 @@ fn main() {
 
 	paths = paths.iter().map(|x| x.offset_points(left_offset, 0)).collect::<Vec<_>>();
 
-	let mut grid = vec![vec!["."; height]; width];
+	let mut grid = vec![vec!["."; height + 1]; width + 1];
 
 
 	let to_draw: Vec<(Point, Point)> = paths.iter().map(|x| x.items.clone()).flatten().collect();
@@ -149,24 +149,24 @@ fn main() {
 	for (start, end) in to_draw {
 		// Run on the Y axis
 		if start.0 == end.0 {
-			let rng = if start.1 > end.1 {
-				end.1..(end.1 -  start.1)
+			let rng: Vec<usize> = if start.1 > end.1 {
+				(end.1..=start.1).collect()
 			} else {
-				(start.1..end.1).collect::<Vec<_>>()
+				(start.1..end.1).collect()
 			};
 			for y in rng {
-				grid[y][start.0 - 1] = "#";
+				grid[y][start.0 ] = "#";
 			}
 		} else {
-			let rng = if start.0 > end.0 {
-				(start.0..end.0).rev().collect::<Vec<_>>()
+			let rng: Vec<usize> = if start.0 > end.0 {
+				(end.0..=start.0).collect()
 			} else {
-				(start.0..end.0).collect::<Vec<_>>()
+				(start.0..end.0).collect()
 			};
 
 			// Run on the X axis
 			for x in rng {
-				grid[start.1][x - 1] = "#";
+				grid[start.1][x] = "#";
 			}
 		}
 	}
