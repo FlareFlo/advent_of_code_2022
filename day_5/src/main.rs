@@ -33,7 +33,6 @@ fn main() {
 			let dest_len = containers[destination_idx].len();
 			containers[destination_idx].insert(dest_len - i, val);
 		}
-
 	}
 
 

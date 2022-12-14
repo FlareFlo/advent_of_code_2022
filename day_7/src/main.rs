@@ -110,15 +110,15 @@ fn main() {
 
 	let mut totals = vec![];
 	flatten(&mut totals, &slash);
-	totals.sort_by(|x, y|y.get_size().cmp(&x.get_size()));
+	totals.sort_by(|x, y| y.get_size().cmp(&x.get_size()));
 
-	println!("{}", totals.iter().filter(|x|x.get_size() >= required_to_free).last().expect("There should be at least one folder").get_size());
+	println!("{}", totals.iter().filter(|x| x.get_size() >= required_to_free).last().expect("There should be at least one folder").get_size());
 }
 
 fn flatten(totals: &mut Vec<Dir>, dir: &Dir) {
 	for entry in &dir.entries {
 		if let Some(dir) = entry.dir() {
-				totals.push(dir.clone());
+			totals.push(dir.clone());
 			flatten(totals, dir);
 		}
 	}
@@ -127,7 +127,7 @@ fn flatten(totals: &mut Vec<Dir>, dir: &Dir) {
 fn filter_flatten(totals: &mut Vec<Dir>, dir: &Dir, limit: usize) {
 	for entry in &dir.entries {
 		if let Some(dir) = entry.dir() {
-			if dir.get_size() <= limit  {
+			if dir.get_size() <= limit {
 				totals.push(dir.clone());
 			}
 			filter_flatten(totals, dir, limit);
@@ -150,8 +150,7 @@ fn eval_line(lines: &[&str], at: &mut usize) -> Vec<Entry> {
 				return entries;
 			}
 			// Ignore as this does nothing right now
-			_ if line.starts_with("$ ls") => {
-			}
+			_ if line.starts_with("$ ls") => {}
 			_ if line.starts_with("$ cd") => {
 				*at += 1;
 				let dirname = line.split(" ").nth(2).expect("Should have a last element");

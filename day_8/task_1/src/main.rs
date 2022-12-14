@@ -30,7 +30,7 @@ fn main() {
 	walk_forest(&map, &mut trees, 0..width, 0..height, false);
 
 	//From bottom
-	walk_forest(&map, &mut trees, 0..width, (0..height).rev(),false);
+	walk_forest(&map, &mut trees, 0..width, (0..height).rev(), false);
 
 	println!("{}", trees.len());
 }

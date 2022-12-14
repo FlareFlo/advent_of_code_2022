@@ -15,7 +15,7 @@ fn main() {
 
 
 	for i in 14..file.len() {
-        let tgt = file[(i - 14)..i].to_owned();
+		let tgt = file[(i - 14)..i].to_owned();
 		if HashSet::<char>::from_iter(tgt).len() == 14 {
 			println!("Task 2 is: {}", i);
 			break;

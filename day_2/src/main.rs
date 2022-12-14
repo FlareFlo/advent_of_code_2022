@@ -83,7 +83,8 @@ fn main() {
 
 			_ => {
 				dbg!(opponent, you, round);
-				panic!("Shape should be matched") }
+				panic!("Shape should be matched")
+			}
 		}
 
 		total_score += you.score_for_picking;
