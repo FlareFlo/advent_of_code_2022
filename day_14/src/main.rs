@@ -26,6 +26,78 @@ impl RockPath {
 			items,
 		}
 	}
+	//								Top left Top right
+	pub fn max_dimensions(&self) -> (Point, Point) {
+		let (
+			mut top,
+			mut bottom,
+			mut left,
+			mut right
+		) = (
+			usize::MAX,
+			usize::MIN,
+			usize::MAX,
+			usize::MIN
+		);
+
+		let mut set_bounds_point =|lhs: Point| {
+			if lhs.0 < left {
+				left = lhs.0;
+			}
+			if lhs.0 > right {
+				right = lhs.0;
+			}
+			if lhs.1 < top {
+				top = lhs.1;
+			}
+			if lhs.1 > bottom {
+				bottom = lhs.1;
+			}
+		};
+
+		for item in &self.items {
+			set_bounds_point(item.0);
+			set_bounds_point(item.1);
+		}
+
+		(Point(left, top), Point(right, bottom))
+	}
+	pub fn max_dimensions_all(items: &[Self]) -> (Point, Point) {
+		let (
+			mut top,
+			mut bottom,
+			mut left,
+			mut right
+		) = (
+			usize::MAX,
+			usize::MIN,
+			usize::MAX,
+			usize::MIN
+		);
+
+		// Dupe i know, dont have time to fix this right now
+		let mut set_bounds_point =|lhs: Point| {
+			if lhs.0 < left {
+				left = lhs.0;
+			}
+			if lhs.0 > right {
+				right = lhs.0;
+			}
+			if lhs.1 < top {
+				top = lhs.1;
+			}
+			if lhs.1 > bottom {
+				bottom = lhs.1;
+			}
+		};
+
+		for item in items {
+			let local = item.max_dimensions();
+			set_bounds_point(local.0);
+			set_bounds_point(local.1);
+		}
+		(Point(left, top), Point(right, bottom))
+	}
 }
 
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -52,5 +124,7 @@ impl Display for Point {
 fn main() {
 	let input = fs::read_to_string("sample_input.txt").unwrap();
 
-	let paths = input.lines().map(|path| RockPath::from_line(path));
+	let paths = input.lines().map(|path| RockPath::from_line(path)).collect::<Vec<_>>();
+
+	eprintln!(" {:?}", RockPath::max_dimensions_all(&paths));
 }
