@@ -26,6 +26,13 @@ impl RockPath {
 			items,
 		}
 	}
+	pub fn offset_points(&self, x: usize, y: usize) -> Self {
+		Self {
+			items: self.items.clone().into_iter().map(|(lhs, rhs)| {
+				(Point(lhs.0 - x, lhs.1 - y), Point(rhs.0 - x, rhs.1 - y))
+			}).collect::<Vec<(Point, Point)>>(),
+		}
+	}
 	//								Top left Top right
 	pub fn max_dimensions(&self) -> (Point, Point) {
 		let (
@@ -40,7 +47,7 @@ impl RockPath {
 			usize::MIN
 		);
 
-		let mut set_bounds_point =|lhs: Point| {
+		let mut set_bounds_point = |lhs: Point| {
 			if lhs.0 < left {
 				left = lhs.0;
 			}
@@ -76,7 +83,7 @@ impl RockPath {
 		);
 
 		// Dupe i know, dont have time to fix this right now
-		let mut set_bounds_point =|lhs: Point| {
+		let mut set_bounds_point = |lhs: Point| {
 			if lhs.0 < left {
 				left = lhs.0;
 			}
@@ -124,7 +131,19 @@ impl Display for Point {
 fn main() {
 	let input = fs::read_to_string("sample_input.txt").unwrap();
 
-	let paths = input.lines().map(|path| RockPath::from_line(path)).collect::<Vec<_>>();
+	let mut paths = input.lines().map(|path| RockPath::from_line(path)).collect::<Vec<_>>();
 
-	eprintln!(" {:?}", RockPath::max_dimensions_all(&paths));
+	let dims = RockPath::max_dimensions_all(&paths);
+
+	let left_offset = dims.0.0;
+	let width = dims.1.0 - left_offset;
+	let height = dims.1.1;
+
+	paths = paths.iter().map(|x| x.offset_points(left_offset, 0)).collect::<Vec<_>>();
+
+	let mut grid = vec![vec!["."; height]; width];
+
+	let dbg_grid = ||grid.iter().map(|x|x.clone().join(" ")).collect::<Vec<_>>().join("\n");
+
+	eprintln!("{}", dbg_grid());
 }
